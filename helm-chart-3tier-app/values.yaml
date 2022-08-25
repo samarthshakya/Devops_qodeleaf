@@ -1,0 +1,72 @@
+
+# Values for backend application.
+backend:
+    metadata_app: backend
+    matchlable_app: backend
+    template_app: backend
+    replicaCount: 1
+    container:
+        mongo_key: MONGO_DB
+        mongourl_key: MONGO_URL
+        node_key: NODE_ENV
+        redis_key: REDIS_URL
+        port: 3000
+        mountPath: /data/db
+    image:
+        name: backend
+        tag: latest
+        pullPolicy: Never
+    service:
+        name: backend
+        app: backend
+        port: 3000
+        targetPort: 3000
+
+# Values for mongo database.
+mongo:
+    serviceName: mongo
+    metadata_app: mongo
+    matchlable_app: mongo
+    template_app: mongo
+    replicaCount: 1
+    container:
+        database: demo
+        pass: demo
+        username: demo
+        port: 27017
+        mountPath: /data/db
+    image:
+        name: mongo
+        tag: latest
+    claim:    
+        storage_class: "standard"
+        accessModes: [ "ReadWriteOnce" ]
+        storage: 1Gi
+    service:
+        name: mongo
+        app: mongo
+        port: 27017
+        targetPort: 27017
+
+# Values for redis database.
+redis:
+    serviceName: redis
+    metadata_app: redis
+    matchlable_app: redis
+    template_app: redis
+    replicaCount: 1
+    container:
+        port: 6379
+        mountPath: /data
+    image:
+        name: redis
+        tag: 6.0
+    claim:    
+        storage_class: "standard"
+        accessModes: [ "ReadWriteOnce" ]
+        storage: 1Gi
+    service:
+        name: redis
+        app: redis
+        port: 6379
+        targetPort: 6379

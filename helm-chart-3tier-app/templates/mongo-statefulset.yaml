@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ .Values.mongo.metadata_app }}
+  name: mongo
+spec:
+  serviceName: {{ .Values.mongo.serviceName }}
+  replicas: {{ .Values.mongo.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.mongo.matchlable_app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mongo.template_app }}
+    spec:
+      containers:
+        - env:
+            - name: MONGO_INITDB_DATABASE
+              value: {{ .Values.mongo.container.database }}
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: {{ .Values.mongo.container.pass }}
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: {{ .Values.mongo.container.username }}
+              
+          image: {{ .Values.mongo.image.name }}:{{ .Values.mongo.image.tag }}
+          name: mongo
+          ports:
+            - containerPort: {{ .Values.mongo.container.port }}
+          volumeMounts:
+            - name: mongodb-persistent-storage-claim
+              mountPath: {{ .Values.mongo.container.mountPath}}
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-persistent-storage-claim
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.mongo.claim.storage_class}}
+    spec:
+      accessModes: {{ .Values.mongo.claim.accessModes}}
+      resources:
+        requests:
+          storage: {{ .Values.mongo.claim.storage}}

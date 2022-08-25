@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: {{ .Values.backend.metadata_app }}  
+spec:
+  replicas: {{ .Values.backend.replicaCount }}  
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.matchlable_app }}  
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.template_app }}  
+    spec:
+      containers:
+        - command: ["npm", "run", "start"]
+          env:
+            - name: MONGO_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: {{ .Values.backend.container.mongo_key }}
+                  
+            - name: MONGO_URL
+              valueFrom:
+                secretKeyRef:
+                  name: env
+                  key: {{ .Values.backend.container.mongourl_key }}
+                  
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: env-config
+                  key: {{ .Values.backend.container.node_key }}
+                  
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: env
+                  key: {{ .Values.backend.container.redis_key }}
+                  
+          image: {{ .Values.backend.image.name }}:{{ .Values.backend.image.tag }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          name: backend
+          ports:
+            - containerPort: {{ .Values.backend.container.port }}

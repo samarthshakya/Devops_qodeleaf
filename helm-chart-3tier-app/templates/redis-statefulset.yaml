@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ .Values.redis.metadata_app }}
+  name: redis
+spec:
+  serviceName: {{ .Values.redis.serviceName }}
+  replicas: {{ .Values.redis.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redis.matchlable_app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redis.template_app }}
+    spec:
+      containers:
+        - image: {{ .Values.redis.image.name }}:{{ .Values.redis.image.tag }}
+          name: redis
+          ports:
+            - containerPort: {{ .Values.redis.container.port }}
+          volumeMounts:
+            - name: redis-persistent-storage-claim
+              mountPath: {{ .Values.redis.container.mountPath }}
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-persistent-storage-claim
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ .Values.redis.claim.storage_class }}
+    spec:
+      accessModes: {{ .Values.redis.claim.accessModes}}
+      resources:
+        requests:
+          storage: {{ .Values.redis.claim.storage}}
